@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#d71920">
+    <style>
+:root {
+  --red: #d71920;
+  --red-dark: #a80f15;
+  --bg: #f6f6f7;
+  --card: #fff;
+  --text: #17171a;
+  --muted: #71717a;
+  --line: #e4e4e7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+body {
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 76px;
+}
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+
+.top {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--red);
+  color: #fff;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.icon-btn {
+  background: rgba(255,255,255,.18); color: #fff;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 10px; width: 40px; height: 40px; font-size: 1.4rem; line-height: 1;
+}
+.logo { direction: ltr; display: flex; align-items: baseline; gap: 4px; flex: 1; justify-content: center; }
+.logo .red {
+  background: #fff; color: var(--red);
+  font-weight: 900; font-size: 1.35rem; letter-spacing: 2px;
+  padding: 0 8px; border-radius: 6px;
+}
+.logo .kala { font-weight: 700; font-size: 1.2rem; }
+.wallet {
+  background: rgba(255,255,255,.18);
+  color: #fff; border: 1px solid rgba(255,255,255,.5);
+  border-radius: 999px; padding: 8px 12px; font-size: .9rem; min-width: 84px;
+}
+
+/* منوی همبرگری */
+.overlay { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.5); }
+.drawer {
+  position: fixed; top: 0; bottom: 0; right: 0; z-index: 31;
+  width: 78%; max-width: 320px; background: #fff;
+  transform: translateX(105%); transition: transform .25s ease;
+  display: flex; flex-direction: column;
+  box-shadow: -4px 0 16px rgba(0,0,0,.25);
+}
+.drawer.open { transform: translateX(0); }
+.drawer-head {
+  background: linear-gradient(135deg, var(--red), var(--red-dark));
+  color: #fff; padding: 28px 16px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+}
+.d-name { font-weight: 700; word-break: break-word; }
+.role { font-size: .8rem; opacity: .9; margin-top: 3px; }
+.role.admin { background: #fff; color: var(--red); display: inline-block; padding: 1px 10px; border-radius: 999px; font-weight: 700; opacity: 1; }
+.drawer-nav { padding: 8px 0; overflow-y: auto; }
+.drawer-nav button {
+  display: block; width: 100%; text-align: right;
+  background: none; border: 0; padding: 14px 18px; font-size: 1rem; color: var(--text);
+}
+.drawer-nav button:active { background: #fff1f1; }
+.drawer-nav hr { border: 0; border-top: 1px solid var(--line); margin: 6px 0; }
+
+main { max-width: 640px; margin: 0 auto; padding: 14px; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+.banner {
+  background: linear-gradient(135deg, var(--red), var(--red-dark));
+  color: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px;
+}
+.banner h2 { font-size: 1.1rem; margin-bottom: 4px; }
+.banner p { font-size: .85rem; opacity: .92; line-height: 1.7; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card {
+  background: var(--card); border-radius: 14px; padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  display: flex; flex-direction: column; gap: 6px;
+  text-align: center;
+}
+.card .pic { font-size: 3rem; line-height: 1.3; }
+.card h3 { font-size: .95rem; }
+.old { color: var(--muted); text-decoration: line-through; font-size: .8rem; }
+.price { color: var(--red); font-weight: 700; font-size: 1rem; }
+.need {
+  background: #fff1f1; color: var(--red-dark);
+  border-radius: 8px; padding: 4px; font-size: .8rem;
+}
+.btn {
+  background: var(--red); color: #fff; border: 0;
+  border-radius: 10px; padding: 10px; font-size: .95rem; width: 100%;
+}
+.btn.secondary { background: #fff; color: var(--red); border: 1px solid var(--red); }
+.btn.small { padding: 7px 12px; font-size: .85rem; width: auto; }
+.btn:disabled { background: #d4d4d8; color: #fff; }
+
+.packs { display: grid; gap: 12px; }
+.pack {
+  background: var(--card); border: 2px solid var(--line);
+  border-radius: 14px; padding: 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.pack.best { border-color: var(--red); }
+.pack .count { font-size: 1.3rem; font-weight: 800; }
+.pack .sub { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+.pack .cost { color: var(--red); font-weight: 700; margin-bottom: 8px; text-align: left; }
+.tag {
+  display: inline-block; background: var(--red); color: #fff;
+  border-radius: 6px; padding: 1px 8px; font-size: .7rem; margin-right: 6px;
+}
+
+ul { list-style: none; }
+#orders li {
+  background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; gap: 8px; font-size: .9rem;
+}
+#orders small { color: var(--muted); display: block; margin-top: 3px; }
+.muted { color: var(--muted); text-align: center; margin: 20px 0; line-height: 1.8; }
+.link { display: block; margin: 16px auto 0; background: none; border: 0; color: var(--red); font-size: .85rem; }
+
+/* ورود و ثبت‌نام */
+.auth { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.seg { display: flex; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 14px; }
+.seg button { flex: 1; border: 0; background: none; padding: 9px; border-radius: 8px; font-size: .95rem; color: var(--muted); }
+.seg button.active { background: var(--red); color: #fff; font-weight: 700; }
+.auth label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 5px; }
+.auth input {
+  width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem;
+}
+.auth input:focus { outline: 2px solid var(--red); border-color: var(--red); }
+.auth .btn { margin-top: 16px; }
+.err { color: var(--red-dark); font-size: .85rem; min-height: 1.2em; margin-top: 10px; }
+
+/* پنل مدیریت */
+.sec { margin: 18px 0 8px; font-size: 1rem; }
+.ucard, .pcard {
+  background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.ucard { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ucard small, .pcard small { display: block; color: var(--muted); margin-top: 3px; font-size: .78rem; }
+.uacts { display: flex; gap: 6px; }
+.btn.danger { background: #fff; color: var(--red-dark); border: 1px solid var(--red); }
+.pcard .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.pcard label { font-size: .75rem; color: var(--muted); display: block; margin-bottom: 4px; }
+.pcard input { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .95rem; }
+
+.bottom {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 5;
+  display: flex; background: #fff; border-top: 1px solid var(--line);
+}
+.bottom button {
+  flex: 1; border: 0; background: none; padding: 8px 0 10px;
+  color: var(--muted); font-size: .75rem;
+}
+.bottom button span { display: block; font-size: 1.4rem; }
+.bottom button.active { color: var(--red); font-weight: 700; }
+
+.modal {
+  position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.5);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  background: #fff; width: 100%; max-width: 640px;
+  border-radius: 18px 18px 0 0; padding: 20px;
+}
+.sheet h3 { margin-bottom: 10px; }
+.row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.row b.bad { color: var(--red); }
+.sheet .actions { display: grid; gap: 8px; margin-top: 14px; }
+.sheet .note { color: var(--muted); font-size: .75rem; margin-top: 10px; line-height: 1.7; }
+.sheet p.lead { line-height: 1.8; color: var(--muted); }
+.big { font-size: 3.5rem; text-align: center; }
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: #18181b; color: #fff; padding: 10px 18px; border-radius: 999px;
+  font-size: .9rem; z-index: 50; max-width: 90%; text-align: center;
+}
+
+</style>
+  <title>RED kala</title>
+</head>
+<body>
+  <header class="top">
+    <button id="menu-btn" class="icon-btn" type="button" aria-label="منو">☰</button>
+    <div class="logo" aria-label="RED kala">
+      <span class="red">RED</span><span class="kala">kala</span>
+    </div>
+    <button class="wallet" id="wallet" type="button">🎟 <b id="ticket-count">۰</b> تیکت</button>
+  </header>
+
+  <div id="overlay" class="overlay" hidden></div>
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div class="avatar">👤</div>
+      <div>
+        <div id="d-name" class="d-name">مهمان</div>
+        <div id="d-role" class="role">وارد نشده‌اید</div>
+      </div>
+    </div>
+    <nav class="drawer-nav">
+      <button type="button" data-go="shop">🛍 فروشگاه</button>
+      <button type="button" data-go="tickets">🎟 خرید تیکت</button>
+      <button type="button" data-go="orders">📜 سابقه من</button>
+      <button type="button" data-go="admin" id="d-admin" hidden>🛠 پنل مدیریت</button>
+      <hr>
+      <button type="button" data-go="login" id="d-login">🔑 ورود / ثبت‌نام</button>
+      <button type="button" id="d-logout" hidden>🚪 خروج از حساب</button>
+    </nav>
+  </aside>
+
+  <main>
+    <section id="tab-shop" class="tab active">
+      <div class="banner">
+        <h2>کالاهای ویژه با یک‌چهارم قیمت</h2>
+        <p>برای خرید هر کالا، علاوه بر قیمت ویژه، تعداد مشخصی تیکت لازم است.</p>
+      </div>
+      <div id="products" class="grid"></div>
+    </section>
+
+    <section id="tab-tickets" class="tab">
+      <div class="banner">
+        <h2>خرید تیکت</h2>
+        <p>موجودی فعلی شما: <b id="ticket-count-2">—</b> تیکت</p>
+      </div>
+      <div id="packs" class="packs"></div>
+    </section>
+
+    <section id="tab-orders" class="tab">
+      <div class="banner"><h2>سابقه</h2></div>
+      <ul id="orders"></ul>
+      <p id="orders-empty" class="muted" hidden></p>
+    </section>
+
+    <section id="tab-login" class="tab">
+      <div class="auth">
+        <div class="seg">
+          <button type="button" data-auth="login" class="active">ورود</button>
+          <button type="button" data-auth="register">ثبت‌نام</button>
+        </div>
+
+        <form id="login-form" autocomplete="on">
+          <label for="l-id">شماره موبایل یا نام کاربری</label>
+          <input id="l-id" type="text" autocomplete="username" required>
+          <label for="l-pass">رمز عبور</label>
+          <input id="l-pass" type="password" autocomplete="current-password" required>
+          <p id="l-err" class="err"></p>
+          <button class="btn" type="submit">ورود</button>
+        </form>
+
+        <form id="register-form" hidden>
+          <label for="r-name">نام و نام خانوادگی</label>
+          <input id="r-name" type="text" autocomplete="name" required>
+          <label for="r-mobile">شماره موبایل</label>
+          <input id="r-mobile" type="tel" inputmode="numeric" placeholder="09123456789" autocomplete="tel" required>
+          <label for="r-pass">رمز عبور (حداقل ۶ کاراکتر)</label>
+          <input id="r-pass" type="password" autocomplete="new-password" required>
+          <label for="r-pass2">تکرار رمز عبور</label>
+          <input id="r-pass2" type="password" autocomplete="new-password" required>
+          <p id="r-err" class="err"></p>
+          <button class="btn" type="submit">ثبت‌نام و دریافت ۲۰ تیکت</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-admin" class="tab">
+      <div class="banner">
+        <h2>پنل مدیریت</h2>
+        <p id="admin-stats"></p>
+      </div>
+      <h3 class="sec">کاربران</h3>
+      <div id="admin-users"></div>
+      <h3 class="sec">کالاها</h3>
+      <div id="admin-products"></div>
+      <button id="admin-reset" class="link" type="button">بازنشانی کامل اطلاعات آزمایشی</button>
+    </section>
+  </main>
+
+  <nav class="bottom">
+    <button data-tab="shop" class="active" type="button"><span>🛍</span>فروشگاه</button>
+    <button data-tab="tickets" type="button"><span>🎟</span>تیکت</button>
+    <button data-tab="orders" type="button"><span>📜</span>سابقه</button>
+  </nav>
+
+  <div id="modal" class="modal" hidden>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div id="modal-body"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script>
+// ===== تنظیمات (قیمت‌ها به تومان) =====
+const START_TICKETS = 20;      // تیکت هدیه‌ی ثبت‌نام
+const SALE_RATIO = 0.25;       // قیمت فروش = یک‌چهارم قیمت اصلی
+
+// حساب مدیر. قبل از تحویل پروژه رمز را عوض کن.
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "admin1234";
+
+const PRODUCTS = [
+  { id: "ps5",    name: "پلی‌استیشن ۵",   emoji: "🎮", original: 28000000, tickets: 30 },
+  { id: "phone",  name: "گوشی هوشمند",    emoji: "📱", original: 20000000, tickets: 25 },
+  { id: "laptop", name: "لپ‌تاپ",          emoji: "💻", original: 40000000, tickets: 40 },
+  { id: "head",   name: "هدفون بی‌سیم",   emoji: "🎧", original: 8000000,  tickets: 10 },
+  { id: "watch",  name: "ساعت هوشمند",    emoji: "⌚", original: 6000000,  tickets: 8  },
+  { id: "cam",    name: "دوربین",          emoji: "📷", original: 24000000, tickets: 28 }
+];
+
+const PACKS = [
+  { id: "p20", tickets: 20, price: 2000000 },
+  { id: "p40", tickets: 40, price: 3750000, best: true }
+];
+
+// ===== هش رمز (SHA-256) =====
+function sha256(ascii) {
+  const rightRotate = (v, a) => (v >>> a) | (v << (32 - a));
+  const maxWord = Math.pow(2, 32);
+  const words = [];
+  const bitLength = ascii.length * 8;
+  let hash = [];
+  const k = [];
+  const isComposite = {};
+  for (let candidate = 2, count = 0; count < 64; candidate++) {
+    if (!isComposite[candidate]) {
+      for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+      if (count < 8) hash[count] = (Math.pow(candidate, 0.5) * maxWord) | 0;
+      k[count++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+    }
+  }
+  ascii += "\x80";
+  while (ascii.length % 64 - 56) ascii += "\x00";
+  for (let i = 0; i < ascii.length; i++) {
+    words[i >> 2] |= ascii.charCodeAt(i) << ((3 - i) % 4) * 8;
+  }
+  words[words.length] = (bitLength / maxWord) | 0;
+  words[words.length] = bitLength;
+  for (let j = 0; j < words.length;) {
+    const w = words.slice(j, j += 16);
+    const old = hash;
+    hash = hash.slice(0, 8);
+    for (let i = 0; i < 64; i++) {
+      const w15 = w[i - 15], w2 = w[i - 2];
+      const a = hash[0], e = hash[4];
+      const t1 = hash[7]
+        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+        + ((e & hash[5]) ^ (~e & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (w[i - 16]
+          + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+          + w[i - 7]
+          + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) | 0);
+      const t2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(t1 + t2) | 0].concat(hash);
+      hash[4] = (hash[4] + t1) | 0;
+    }
+    for (let i = 0; i < 8; i++) hash[i] = (hash[i] + old[i]) | 0;
+  }
+  let out = "";
+  for (let i = 0; i < 8; i++) {
+    for (let j = 3; j + 1; j--) {
+      const b = (hash[i] >> (j * 8)) & 255;
+      out += (b < 16 ? "0" : "") + b.toString(16);
+    }
+  }
+  return out;
+}
+
+function toBinaryString(str) {
+  const bytes = unescape(encodeURIComponent(str));
+  return bytes;
+}
+function hashPass(salt, pass) {
+  return sha256(toBinaryString(salt + ":" + pass));
+}
+function makeSalt() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+// ===== ذخیره‌سازی =====
+const KEY = "redkala-v2";
+let db = loadDB();
+
+function loadDB() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.users && typeof s.users === "object") {
+      return { users: s.users, session: s.session || null, products: s.products || {} };
+    }
+  } catch (e) {}
+  return { users: {}, session: null, products: {} };
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {}
+}
+
+function seedAdmin() {
+  if (db.users[ADMIN_USERNAME]) return;
+  const salt = makeSalt();
+  db.users[ADMIN_USERNAME] = {
+    username: ADMIN_USERNAME,
+    name: "مدیر فروشگاه",
+    role: "admin",
+    salt: salt,
+    hash: hashPass(salt, ADMIN_PASSWORD),
+    tickets: 0,
+    history: []
+  };
+  save();
+}
+
+// ===== ابزار =====
+const $ = id => document.getElementById(id);
+const fa = n => Number(n).toLocaleString("fa-IR");
+const money = n => fa(n) + " تومان";
+const salePrice = p => Math.round(p.original * SALE_RATIO);
+
+function normDigits(s) {
+  return String(s)
+    .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+    .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+}
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function prod(base) {
+  const o = db.products[base.id] || {};
+  return {
+    id: base.id, name: base.name, emoji: base.emoji,
+    original: o.original > 0 ? o.original : base.original,
+    tickets: o.tickets > 0 ? o.tickets : base.tickets
+  };
+}
+function findProduct(id) {
+  for (let i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return prod(PRODUCTS[i]);
+  return null;
+}
+
+function current() {
+  return db.session && db.users[db.session] ? db.users[db.session] : null;
+}
+function isAdmin() {
+  const u = current();
+  return !!u && u.role === "admin";
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+}
+
+// ===== صفحه‌ها و منو =====
+const TABS = ["shop", "tickets", "orders", "login", "admin"];
+
+function showTab(name) {
+  if (name === "admin" && !isAdmin()) name = "shop";
+  if (name === "login" && current()) name = isAdmin() ? "admin" : "shop";
+  TABS.forEach(t => $("tab-" + t).classList.toggle("active", t === name));
+  document.querySelectorAll(".bottom button").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === name));
+  if (name === "login") setAuthMode("login");
+  if (name === "orders") renderOrders();
+  if (name === "admin") renderAdmin();
+  if (name === "tickets") renderHeader();
+  window.scrollTo(0, 0);
+}
+
+function openDrawer() {
+  renderDrawer();
+  $("overlay").hidden = false;
+  $("drawer").classList.add("open");
+  $("drawer").setAttribute("aria-hidden", "false");
+}
+function closeDrawer() {
+  $("overlay").hidden = true;
+  $("drawer").classList.remove("open");
+  $("drawer").setAttribute("aria-hidden", "true");
+}
+
+function openModal(node) {
+  const body = $("modal-body");
+  body.innerHTML = "";
+  body.appendChild(node);
+  $("modal").hidden = false;
+}
+function closeModal() { $("modal").hidden = true; }
+
+function modalButtons(list) {
+  const act = el("div", "actions");
+  list.forEach(b => {
+    const btn = el("button", "btn" + (b.secondary ? " secondary" : ""), b.text);
+    btn.type = "button";
+    btn.onclick = b.onClick;
+    act.appendChild(btn);
+  });
+  return act;
+}
+
+function rowEl(label, valueNode, bad) {
+  const r = el("div", "row");
+  r.appendChild(el("span", null, label));
+  if (typeof valueNode === "string") {
+    r.appendChild(el("b", bad ? "bad" : null, valueNode));
+  } else {
+    r.appendChild(valueNode);
+  }
+  return r;
+}
+
+// ===== نمایش =====
+function renderHeader() {
+  const u = current();
+  const admin = isAdmin();
+  $("wallet").hidden = admin;
+  const val = u && !admin ? fa(u.tickets) : "—";
+  $("ticket-count").textContent = val;
+  $("ticket-count-2").textContent = val;
+}
+
+function renderDrawer() {
+  const u = current();
+  $("d-name").textContent = u ? u.name : "مهمان";
+  const role = $("d-role");
+  if (!u) { role.textContent = "وارد نشده‌اید"; role.className = "role"; }
+  else if (u.role === "admin") { role.textContent = "مدیر"; role.className = "role admin"; }
+  else { role.textContent = u.username; role.className = "role"; }
+  $("d-admin").hidden = !isAdmin();
+  $("d-login").hidden = !!u;
+  $("d-logout").hidden = !u;
+}
+
+function renderProducts() {
+  const box = $("products");
+  box.innerHTML = "";
+  PRODUCTS.forEach(base => {
+    const p = prod(base);
+    const card = el("div", "card");
+    card.appendChild(el("div", "pic", p.emoji));
+    card.appendChild(el("h3", null, p.name));
+    card.appendChild(el("div", "old", money(p.original)));
+    card.appendChild(el("div", "price", money(salePrice(p))));
+    card.appendChild(el("div", "need", "🎟 " + fa(p.tickets) + " تیکت لازم است"));
+    const btn = el("button", "btn", "خرید");
+    btn.type = "button";
+    btn.onclick = () => openProduct(p.id);
+    card.appendChild(btn);
+    box.appendChild(card);
+  });
+}
+
+function renderPacks() {
+  const box = $("packs");
+  box.innerHTML = "";
+  PACKS.forEach(k => {
+    const row = el("div", "pack" + (k.best ? " best" : ""));
+    const left = el("div");
+    const count = el("div", "count", fa(k.tickets) + " تیکت");
+    if (k.best) count.appendChild(el("span", "tag", "به‌صرفه‌تر"));
+    left.appendChild(count);
+    left.appendChild(el("div", "sub", "هر تیکت " + money(Math.round(k.price / k.tickets))));
+    const right = el("div");
+    right.appendChild(el("div", "cost", money(k.price)));
+    const btn = el("button", "btn", "خرید بسته");
+    btn.type = "button";
+    btn.onclick = () => openPack(k.id);
+    right.appendChild(btn);
+    row.append(left, right);
+    box.appendChild(row);
+  });
+}
+
+function renderOrders() {
+  const ul = $("orders");
+  ul.innerHTML = "";
+  const u = current();
+  const empty = $("orders-empty");
+  if (!u) {
+    empty.textContent = "برای دیدن سابقه، وارد حساب خود شوید.";
+    empty.hidden = false;
+    return;
+  }
+  empty.textContent = "هنوز سفارشی ثبت نشده است.";
+  empty.hidden = u.history.length > 0;
+  u.history.forEach(h => {
+    const li = el("li");
+    const left = el("div");
+    left.appendChild(el("div", null, h.title));
+    left.appendChild(el("small", null, new Date(h.date).toLocaleString("fa-IR")));
+    li.append(left, el("div", null, h.detail));
+    ul.appendChild(li);
+  });
+}
+
+function renderAll() {
+  renderHeader();
+  renderDrawer();
+  renderProducts();
+  renderOrders();
+}
+
+// ===== درخواست ورود =====
+function promptLogin() {
+  const box = el("div");
+  box.appendChild(el("div", "big", "🔑"));
+  box.appendChild(el("h3", null, "ورود لازم است"));
+  box.appendChild(el("p", "lead", "برای خرید کالا یا تیکت، ابتدا وارد حساب خود شوید یا ثبت‌نام کنید."));
+  box.appendChild(modalButtons([
+    { text: "ورود / ثبت‌نام", onClick: () => { closeModal(); showTab("login"); } },
+    { text: "بعداً", secondary: true, onClick: closeModal }
+  ]));
+  openModal(box);
+}
+
+function guardBuyer() {
+  const u = current();
+  if (!u) { promptLogin(); return null; }
+  if (u.role === "admin") { toast("با حساب مدیر خرید انجام نمی‌شود"); return null; }
+  return u;
+}
+
+// ===== خرید کالا =====
+function openProduct(id) {
+  const u = guardBuyer();
+  if (!u) return;
+  const p = findProduct(id);
+  const enough = u.tickets >= p.tickets;
+  const box = el("div");
+  box.appendChild(el("div", "big", p.emoji));
+  box.appendChild(el("h3", null, p.name));
+  box.appendChild(rowEl("قیمت اصلی", el("span", "old", money(p.original))));
+  box.appendChild(rowEl("قیمت ویژه (یک‌چهارم)", money(salePrice(p))));
+  box.appendChild(rowEl("تیکت لازم", fa(p.tickets)));
+  box.appendChild(rowEl("تیکت شما", fa(u.tickets), !enough));
+  if (!enough) box.appendChild(rowEl("کمبود", fa(p.tickets - u.tickets) + " تیکت", true));
+  const buttons = [];
+  if (enough) {
+    buttons.push({
+      text: "تأیید خرید (" + fa(p.tickets) + " تیکت + " + money(salePrice(p)) + ")",
+      onClick: () => buyProduct(p.id)
+    });
+  } else {
+    buttons.push({ text: "خرید تیکت", onClick: () => { closeModal(); showTab("tickets"); } });
+  }
+  buttons.push({ text: "بستن", secondary: true, onClick: closeModal });
+  box.appendChild(modalButtons(buttons));
+  box.appendChild(el("p", "note", "نسخه‌ی آزمایشی: پرداخت واقعی انجام نمی‌شود."));
+  openModal(box);
+}
+
+function buyProduct(id) {
+  const u = current();
+  const p = findProduct(id);
+  if (!u || !p || u.role === "admin" || u.tickets < p.tickets) return;
+  u.tickets -= p.tickets;
+  u.history.unshift({
+    title: "خرید " + p.name,
+    detail: "−" + fa(p.tickets) + " تیکت، " + money(salePrice(p)),
+    date: Date.now()
+  });
+  save();
+  closeModal();
+  renderHeader();
+  renderOrders();
+  toast("خرید " + p.name + " ثبت شد ✅");
+}
+
+// ===== خرید تیکت =====
+function openPack(id) {
+  const u = guardBuyer();
+  if (!u) return;
+  const k = PACKS.filter(x => x.id === id)[0];
+  const box = el("div");
+  box.appendChild(el("div", "big", "🎟"));
+  box.appendChild(el("h3", null, "خرید بسته‌ی " + fa(k.tickets) + " تیکتی"));
+  box.appendChild(rowEl("مبلغ", money(k.price)));
+  box.appendChild(rowEl("موجودی بعد از خرید", fa(u.tickets + k.tickets) + " تیکت"));
+  box.appendChild(modalButtons([
+    { text: "تأیید و پرداخت آزمایشی", onClick: () => buyPack(k.id) },
+    { text: "انصراف", secondary: true, onClick: closeModal }
+  ]));
+  box.appendChild(el("p", "note", "نسخه‌ی آزمایشی: پرداخت واقعی انجام نمی‌شود و تیکت‌ها فقط روی همین گوشی ذخیره می‌شوند."));
+  openModal(box);
+}
+
+function buyPack(id) {
+  const u = current();
+  const k = PACKS.filter(x => x.id === id)[0];
+  if (!u || !k || u.role === "admin") return;
+  u.tickets += k.tickets;
+  u.history.unshift({
+    title: "خرید بسته‌ی " + fa(k.tickets) + " تیکتی",
+    detail: "+" + fa(k.tickets) + " تیکت، " + money(k.price),
+    date: Date.now()
+  });
+  save();
+  closeModal();
+  renderHeader();
+  renderOrders();
+  toast(fa(k.tickets) + " تیکت اضافه شد 🎟");
+}
+
+// ===== ورود و ثبت‌نام =====
+function setAuthMode(mode) {
+  document.querySelectorAll(".seg button").forEach(b =>
+    b.classList.toggle("active", b.dataset.auth === mode));
+  $("login-form").hidden = mode !== "login";
+  $("register-form").hidden = mode !== "register";
+  $("l-err").textContent = "";
+  $("r-err").textContent = "";
+}
+
+function doLogin(e) {
+  e.preventDefault();
+  const id = normDigits($("l-id").value).trim().toLowerCase();
+  const pass = $("l-pass").value;
+  const u = db.users[id];
+  if (!u || hashPass(u.salt, pass) !== u.hash) {
+    $("l-err").textContent = "نام کاربری یا رمز عبور اشتباه است.";
+    return;
+  }
+  db.session = u.username;
+  save();
+  $("login-form").reset();
+  $("l-err").textContent = "";
+  renderAll();
+  toast("خوش آمدید " + u.name);
+  showTab(u.role === "admin" ? "admin" : "shop");
+}
+
+function doRegister(e) {
+  e.preventDefault();
+  const name = $("r-name").value.trim();
+  const mobile = normDigits($("r-mobile").value).trim();
+  const pass = $("r-pass").value;
+  const pass2 = $("r-pass2").value;
+  const err = $("r-err");
+  if (name.length < 2) { err.textContent = "نام را وارد کنید."; return; }
+  if (!/^09\d{9}$/.test(mobile)) { err.textContent = "شماره موبایل باید به شکل 09123456789 باشد."; return; }
+  if (pass.length < 6) { err.textContent = "رمز عبور حداقل ۶ کاراکتر باشد."; return; }
+  if (pass !== pass2) { err.textContent = "تکرار رمز عبور برابر نیست."; return; }
+  if (db.users[mobile]) { err.textContent = "این شماره قبلاً ثبت‌نام کرده است."; return; }
+  const salt = makeSalt();
+  db.users[mobile] = {
+    username: mobile,
+    name: name,
+    role: "user",
+    salt: salt,
+    hash: hashPass(salt, pass),
+    tickets: START_TICKETS,
+    history: [{ title: "هدیه‌ی ثبت‌نام", detail: "+" + fa(START_TICKETS) + " تیکت", date: Date.now() }]
+  };
+  db.session = mobile;
+  save();
+  $("register-form").reset();
+  err.textContent = "";
+  renderAll();
+  toast("ثبت‌نام انجام شد. " + fa(START_TICKETS) + " تیکت هدیه گرفتی 🎁");
+  showTab("shop");
+}
+
+function logout() {
+  db.session = null;
+  save();
+  closeDrawer();
+  renderAll();
+  toast("از حساب خارج شدی");
+  showTab("shop");
+}
+
+// ===== پنل مدیریت =====
+function twoStep(btn, label, action) {
+  let armed = false;
+  let timer;
+  btn.onclick = () => {
+    if (!armed) {
+      armed = true;
+      btn.textContent = "مطمئنی؟";
+      timer = setTimeout(() => { armed = false; btn.textContent = label; }, 3000);
+    } else {
+      clearTimeout(timer);
+      action();
+    }
+  };
+}
+
+function adjustTickets(username, delta) {
+  const u = db.users[username];
+  if (!u || !isAdmin()) return;
+  u.tickets = Math.max(0, u.tickets + delta);
+  u.history.unshift({
+    title: "تغییر توسط مدیر",
+    detail: (delta > 0 ? "+" : "−") + fa(Math.abs(delta)) + " تیکت",
+    date: Date.now()
+  });
+  save();
+  renderAdmin();
+}
+
+function fieldEl(label, value) {
+  const wrap = el("div");
+  wrap.appendChild(el("label", null, label));
+  const input = el("input");
+  input.type = "text";
+  input.inputMode = "numeric";
+  input.value = String(value);
+  wrap.appendChild(input);
+  return { wrap: wrap, input: input };
+}
+
+function renderAdmin() {
+  if (!isAdmin()) return;
+  const users = Object.keys(db.users).map(k => db.users[k]).filter(u => u.role !== "admin");
+  const total = users.reduce((s, u) => s + u.tickets, 0);
+  $("admin-stats").textContent =
+    fa(users.length) + " کاربر ثبت‌نام‌شده، مجموع " + fa(total) + " تیکت در حساب‌ها";
+
+  const ubox = $("admin-users");
+  ubox.innerHTML = "";
+  if (!users.length) ubox.appendChild(el("p", "muted", "هنوز کاربری ثبت‌نام نکرده است."));
+  users.forEach(u => {
+    const card = el("div", "ucard");
+    const info = el("div");
+    info.appendChild(el("b", null, u.name));
+    info.appendChild(el("small", null, u.username + " · " + fa(u.tickets) + " تیکت · " + fa(u.history.length) + " مورد سابقه"));
+    const acts = el("div", "uacts");
+    const plus = el("button", "btn small", "+" + fa(10));
+    plus.type = "button";
+    plus.onclick = () => adjustTickets(u.username, 10);
+    const minus = el("button", "btn small secondary", "−" + fa(10));
+    minus.type = "button";
+    minus.onclick = () => adjustTickets(u.username, -10);
+    const del = el("button", "btn small danger", "حذف");
+    del.type = "button";
+    twoStep(del, "حذف", () => {
+      delete db.users[u.username];
+      save();
+      renderAdmin();
+      toast("کاربر حذف شد");
+    });
+    acts.append(plus, minus, del);
+    card.append(info, acts);
+    ubox.appendChild(card);
+  });
+
+  const pbox = $("admin-products");
+  pbox.innerHTML = "";
+  PRODUCTS.forEach(base => {
+    const p = prod(base);
+    const card = el("div", "pcard");
+    card.appendChild(el("b", null, base.emoji + " " + base.name));
+    const f1 = fieldEl("قیمت اصلی (تومان)", p.original);
+    const f2 = fieldEl("تیکت لازم", p.tickets);
+    const fields = el("div", "fields");
+    fields.append(f1.wrap, f2.wrap);
+    card.appendChild(fields);
+    card.appendChild(el("small", null, "قیمت ویژه‌ی فعلی: " + money(salePrice(p))));
+    const saveBtn = el("button", "btn small", "ذخیره");
+    saveBtn.type = "button";
+    saveBtn.style.marginTop = "8px";
+    saveBtn.onclick = () => {
+      const o = parseInt(normDigits(f1.input.value).replace(/[,\s]/g, ""), 10);
+      const t = parseInt(normDigits(f2.input.value).replace(/[,\s]/g, ""), 10);
+      if (!(o > 0) || !(t > 0)) { toast("مقدارها باید عدد مثبت باشند"); return; }
+      db.products[base.id] = { original: o, tickets: t };
+      save();
+      renderProducts();
+      renderAdmin();
+      toast("ذخیره شد");
+    };
+    card.appendChild(saveBtn);
+    pbox.appendChild(card);
+  });
+}
+
+// ===== رویدادها =====
+document.querySelectorAll(".bottom button").forEach(b => {
+  b.onclick = () => showTab(b.dataset.tab);
+});
+document.querySelectorAll(".drawer-nav button[data-go]").forEach(b => {
+  b.onclick = () => { closeDrawer(); showTab(b.dataset.go); };
+});
+document.querySelectorAll(".seg button").forEach(b => {
+  b.onclick = () => setAuthMode(b.dataset.auth);
+});
+$("menu-btn").onclick = openDrawer;
+$("overlay").onclick = closeDrawer;
+$("d-logout").onclick = logout;
+$("wallet").onclick = () => showTab("tickets");
+$("modal").onclick = e => { if (e.target === $("modal")) closeModal(); };
+$("login-form").addEventListener("submit", doLogin);
+$("register-form").addEventListener("submit", doRegister);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { closeDrawer(); closeModal(); }
+});
+twoStep($("admin-reset"), "بازنشانی کامل اطلاعات آزمایشی", () => {
+  const keep = db.users[ADMIN_USERNAME];
+  db = { users: {}, session: ADMIN_USERNAME, products: {} };
+  if (keep) db.users[ADMIN_USERNAME] = keep;
+  save();
+  renderAll();
+  renderAdmin();
+  toast("همه‌چیز بازنشانی شد");
+});
+
+seedAdmin();
+renderPacks();
+renderAll();
+
+
+</script>
+</body>
+</html>
